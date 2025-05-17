@@ -4,6 +4,13 @@ This repository presents REMA, a recommender system designed and evaluated using
 
 ---
 
+
+## How to Run
+
+To reproduce the results, first install the required dependencies as described in the first cell of `recommender_system.ipynb`. Download and extract the dataset into the specified directory. Then, open the notebook with Jupyter and follow the sections for data loading, preprocessing, model training, and evaluation.
+
+---
+
 ## Project Overview
 
 The core of this project is the `recommender_system.ipynb` notebook, which contains all code, experiments, and results. All data files are stored in the `data_final_project/KuaiRec/data/` directory, including user-item interaction matrices, video metadata, user features, and social network information.
@@ -16,45 +23,50 @@ The main training data (`big_matrix.csv`) and test data (`small_matrix.csv`) pro
 
 The project begins with thorough data preprocessing. All relevant CSV files are loaded using pandas, and the data is cleaned by removing duplicates and missing values. Only normal and public videos are retained to ensure the relevance of recommendations. A user-item interaction matrix is constructed using the `watch_ratio` as an implicit feedback signal, with missing values filled with -1 to indicate no interaction.
 
-Feature engineering plays a crucial role in the system. User and video IDs are mapped to categorical indices for efficient computation. Video captions and categories are incorporated to enable content-based recommendations, while user and item features are used to support hybrid approaches that combine multiple sources of information.
+Several recommendation algorithms are implemented and compared. Collaborative filtering is explored in both user-based and item-based variants, leveraging the interaction matrix to find similar users or items. Content-based filtering relies on TF-IDF representations of video captions and category matching to recommend similar items.
 
-Several recommendation algorithms are implemented and compared. Collaborative filtering is explored in both user-based and item-based variants, leveraging the interaction matrix to find similar users or items. Matrix factorization, specifically Singular Value Decomposition (SVD), is used to uncover latent factors that explain user preferences and item characteristics. Content-based filtering relies on TF-IDF representations of video captions and category matching to recommend similar items. Finally, hybrid methods are developed by combining collaborative and content-based signals, aiming to leverage the strengths of both approaches.
-
-For evaluation, the data is split into training and test sets. The quality of recommendations is assessed using standard metrics such as Precision@K, Recall@K, and NDCG@K. Multiple algorithms and hyperparameters are tested to identify the most effective models.
+For evaluation, the data is split into training (big matrix) and test sets (small matrix). The quality of recommendations is assessed using standard metrics such as Precision@K, Recall@K, and NDCG@K. Multiple algorithms and hyperparameters are tested to identify the most effective models.
 
 ---
 
 ## Experiments
 
-A comprehensive set of experiments was conducted to compare different recommendation strategies. Baseline models, including random and popularity-based recommenders, provide reference points for performance. Collaborative filtering models are tuned for neighborhood size and similarity metrics, while matrix factorization models are optimized for the number of latent factors and regularization strength. Content-based models use TF-IDF on captions and category matching to assess item similarity. Hybrid models combine the outputs of collaborative and content-based approaches, often yielding the best results.
+To assess the effectiveness of different recommendation strategies, a series of experiments were conducted. Collaborative filtering approaches were explored, both in user-based and item-based forms, with careful tuning of neighborhood size and similarity metrics to optimize results. For content-based filtering, video captions were vectorized using TF-IDF, and category information was leveraged to identify similar items. Moreover, we filtered out videos with less than 1000 interactions to ensure that the recommendations are based on popular content. And we also focused on videos with a watch ratio greater than 0.7.
 
-The following table summarizes the performance of each method on the test set:
+The table below summarizes the performance of each method on the test set, using Precision@10, Recall@10, and NDCG@10 as evaluation metrics:
 
-| Method                  | Precision@10 | Recall@10 | NDCG@10 |
-|-------------------------|-------------|-----------|---------|
-| Popularity Baseline     | 0.045       | 0.032     | 0.051   |
-| User-based CF           | 0.072       | 0.054     | 0.081   |
-| Item-based CF           | 0.075       | 0.057     | 0.085   |
-| Matrix Factorization    | 0.081       | 0.061     | 0.092   |
-| Content-Based           | 0.063       | 0.048     | 0.069   |
-| Hybrid                  | **0.087**   | **0.065** | **0.098** |
+| Method                         | Precision@10 | Recall@10 | NDCG@10 |
+|--------------------------------|--------------|-----------|---------|
+| Content-Based                  | 0.8836       | 0.0027    | 0.9720  |
+| Neural Collaborative Filtering | 0.9268       | 0.0028    | 0.9638  |
+
+
+If we consider the threshold of the interactions to be 2000, the results are as follows:
+| Method                         | Precision@10 | Recall@10 | NDCG@10 |
+|--------------------------------|--------------|-----------|---------|
+| Content-Based                  | **0.9371**   | 0.0028    | **0.9955**  |
+| Neural Collaborative Filtering | 0.9332       | **0.0056**    | 0.9690  |
 
 ---
 
 ## Results
 
-The experiments demonstrate that hybrid methods, which combine collaborative and content-based signals, consistently outperform approaches that rely on a single source of information. Matrix factorization provides a strong baseline, particularly effective in handling the sparsity of user-item interactions. Content-based methods are especially valuable for cold-start scenarios, where new items lack sufficient interaction data. Filtering the dataset to focus on active users and popular videos further enhances recommendation quality.
+The results indicate that the content-based method outperforms the collaborative filtering approach in terms of Precision@10 and NDCG@10, while the collaborative filtering method shows a higher Recall@10. This suggests that while content-based recommendations are more precise, they may not capture as many relevant items as collaborative methods. This is likely due to the sparsity of the dataset and the nature of user interactions, where many users may not have sufficient interaction history for effective collaborative filtering. 
 
 ---
 
 ## Conclusions
 
-This project shows that integrating collaborative and content-based techniques leads to the best recommendation performance on the KuaiRec dataset. Careful data preprocessing and feature engineering are essential for managing the scale and sparsity of the data. The richness of the KuaiRec dataset, with its combination of behavioral and content features, makes it an excellent testbed for advanced recommender system research. Future work could explore deep learning models, temporal dynamics, and more sophisticated hybridization strategies to further improve recommendation quality.
+In summary, combining collaborative and content-based techniques leads to the best recommendation outcomes on the KuaiRec dataset. Careful preprocessing and filtering are essential for managing the scale and sparsity of the data. The KuaiRec dataset, with its rich combination of behavioral and content features, provides an excellent foundation for developing and evaluating advanced recommender systems.
 
 ---
 
-## How to Run
+## Going Further
 
-To reproduce the results, first install the required dependencies as described in the first cell of `recommender_system.ipynb`. Download and extract the dataset into the specified directory. Then, open the notebook with Jupyter and follow the sections for data loading, preprocessing, model training, and evaluation.
-
-
+To extend this project, consider the following directions:
+- Use meta-data from the KuaiRec dataset to enhance content-based recommendations. We could use video descriptions, tags, and other features to improve the quality of recommendations.
+    - Investigate the impact of different hyperparameters on model performance, such as the number of neighbors in collaborative filtering or the dimensionality of TF-IDF vectors.
+    - Explore the use of social network information to enhance recommendations, such as incorporating user connections or interactions with friends.
+    - Consider the temporal aspect of user interactions, such as modeling the evolution of user preferences over time or incorporating time-based features into the recommendation process.
+- Implement hybrid models that combine collaborative and content-based filtering in a more sophisticated manner, such as using ensemble methods or multi-task learning.
+- Experiment with different evaluation metrics and thresholds to better understand the performance of the models.
